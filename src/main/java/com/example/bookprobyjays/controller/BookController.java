@@ -11,10 +11,12 @@ import com.example.bookprobyjays.exception.BusinessException;
 import com.example.bookprobyjays.service.BookService;
 import com.example.bookprobyjays.service.OrderService;
 import com.example.bookprobyjays.utils.UserHolder;
+import com.example.bookprobyjays.vo.BookCartVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/book")
@@ -116,11 +118,20 @@ public class BookController {
      * @return
      */
     @DeleteMapping("/deleteBookCart")
-    public  BaseResponse<BookCartDto> deleteBookCart(@RequestBody BookCartDto bookCartDto){
+    public BaseResponse<BookCartDto> deleteBookCart(@RequestBody BookCartDto bookCartDto){
         if(bookCartDto == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"书籍请求参数为空");
         }
         orderService.deleteBookCart(bookCartDto);
         return ResultUtils.success(bookCartDto);
+    }
+
+    /**
+     * 罗列购物车
+     * @return
+     */
+    @GetMapping("/list/BookCartVoList")
+    public BaseResponse<List<BookCartVo>> listBookCartVo(){
+        return ResultUtils.success(orderService.listBookCartVo());
     }
 }

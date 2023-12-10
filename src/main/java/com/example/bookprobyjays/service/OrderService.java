@@ -3,6 +3,9 @@ package com.example.bookprobyjays.service;
 import com.example.bookprobyjays.domain.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.bookprobyjays.dto.BookCartDto;
+import com.example.bookprobyjays.vo.BookCartVo;
+
+import java.util.List;
 
 /**
 * @author chenjiexiang
@@ -14,4 +17,6 @@ public interface OrderService extends IService<Order> {
     BookCartDto addBookCart(BookCartDto bookCartDto);
     //减少购物车书籍数量
     BookCartDto deleteBookCart(BookCartDto bookCartDto);
+    //列出购物车订单
+    List<BookCartVo> listBookCartVo();
 }

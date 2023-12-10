@@ -19,6 +19,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author chenjiexiang
@@ -99,6 +102,28 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
             stringRedisTemplate.opsForHash().delete(key,bookId);
         }
         return bookCartDto;
+    }
+
+    /**
+     * 罗列购物车
+     * @return
+     */
+    @Override
+    public List<BookCartVo> listBookCartVo() {
+        String key = BOOK_CART_KEY+ UserHolder.getUser().getUserAccount();
+        //用map获取redis的数据
+        Map<Object,Object> map = stringRedisTemplate.opsForHash().entries(key);
+        if(map.size() == 0){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"map无数据");
+        }
+        List<BookCartVo> list = new ArrayList<>();
+        //把map数据取出到list中
+        for(Map.Entry<Object,Object> entry : map.entrySet()){
+            String cartItem = entry.getValue().toString();
+            BookCartVo bookCartVo = JSONUtil.toBean(cartItem, BookCartVo.class);
+            list.add(bookCartVo);
+        }
+        return list;
     }
 }
 
