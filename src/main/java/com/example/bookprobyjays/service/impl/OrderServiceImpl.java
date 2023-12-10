@@ -125,6 +125,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         }
         return list;
     }
+
+    /**
+     * 从购物车拿订单，完成下单功能
+     * @return
+     */
+    @Override
+    public Order createOrder() {
+        List<BookCartVo> bookCartVoList = this.listBookCartVo();
+        String bookCartVoListJson = JSONUtil.toJsonStr(bookCartVoList);
+        Order order = new Order();
+        order.setBookList(bookCartVoListJson);
+        order.setId(null);
+        order.setUserId(UserHolder.getUser().getId());
+        this.save(order);
+        return order;
+    }
 }
 
 
