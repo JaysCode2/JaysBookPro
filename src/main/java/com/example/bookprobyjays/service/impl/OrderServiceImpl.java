@@ -51,6 +51,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         }
         BookCartVo bookCartVo = BeanUtil.copyProperties(book,BookCartVo.class);
         bookCartVo.setNum(bookCartDto.getNum());
+        bookCartVo.setBookId(book.getId());
 
         //查询redis中是否存在该书籍，若存在，直接加数量就行了
         if(stringRedisTemplate.opsForHash().hasKey(key,book.getId().toString())){
