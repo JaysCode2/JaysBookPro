@@ -1,6 +1,7 @@
 package com.example.bookprobyjays.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.bookprobyjays.common.ErrorCode;
@@ -81,6 +82,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         String bookId = bookCartDto.getBookId().toString();
 
         String bookCartJson = (String) stringRedisTemplate.opsForHash().get(key,bookId);
+        //处理找不到订单没有响应的问题
+        if(StrUtil.isBlank(bookCartJson)){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"无订单数据");
+        }
         BookCartVo bookCartVoUpdate = JSONUtil.toBean(bookCartJson, BookCartVo.class);
 
         if(bookCartDto.getNum() > bookCartVoUpdate.getNum()){
