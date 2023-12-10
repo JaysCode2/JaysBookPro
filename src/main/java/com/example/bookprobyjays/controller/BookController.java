@@ -1,6 +1,7 @@
 package com.example.bookprobyjays.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bookprobyjays.common.BaseResponse;
 import com.example.bookprobyjays.common.ErrorCode;
 import com.example.bookprobyjays.common.ResultUtils;
@@ -57,6 +58,12 @@ public class BookController {
         boolean deleteBook = bookService.removeById(book);
         return ResultUtils.success(deleteBook);
     }
+
+    /**
+     * 更改书籍信息
+     * @param book
+     * @return
+     */
     @PutMapping("/update")
     public BaseResponse<Book> updateBook(@RequestBody Book book){
         if(book == null){
@@ -69,5 +76,19 @@ public class BookController {
         book.setUserId(UserHolder.getUser().getId());
         bookService.updateById(book);
         return ResultUtils.success(book);
+    }
+
+    /**
+     * 书籍条分页件，但是传参数最好做成dto类传
+     * @param current
+     * @param pageSize
+     * @param book
+     * @return
+     */
+    @GetMapping("/list/pageByWrapper")
+    public BaseResponse<Page<Book>> getBookPage(long current,long pageSize,Book book){
+        Page<Book> pageInfo = bookService.page(new Page<>(current,pageSize),
+                bookService.queryWrapper(book));
+        return ResultUtils.success(pageInfo);
     }
 }

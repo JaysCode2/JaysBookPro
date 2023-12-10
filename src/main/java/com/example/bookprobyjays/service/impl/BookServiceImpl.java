@@ -1,5 +1,6 @@
 package com.example.bookprobyjays.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.bookprobyjays.domain.Book;
 import com.example.bookprobyjays.service.BookService;
@@ -15,6 +16,19 @@ import org.springframework.stereotype.Service;
 public class BookServiceImpl extends ServiceImpl<BookMapper, Book>
     implements BookService{
 
+    /**
+     * 查询条件构造
+     * @param book
+     * @return
+     */
+    @Override
+    public LambdaQueryWrapper<Book> queryWrapper(Book book) {
+        LambdaQueryWrapper<Book> queryWrapper =new LambdaQueryWrapper<>();
+        queryWrapper.eq(book.getTitle()!=null,Book::getTitle,book.getTitle())
+                    .or()
+                    .like(book.getContent()!=null,Book::getContent,book.getContent());
+        return queryWrapper;
+    }
 }
 
 
