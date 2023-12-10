@@ -1,0 +1,34 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jays_book
+    username: root
+    password: 123456
+  redis:
+    database: 4
+    host: localhost
+    port: 6379
+    timeout: 5000
+  # \u652F\u6301 swagger3
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete # \u5168\u5C40\u903B\u8F91\u5220\u9664\u7684\u5B9E\u4F53\u5B57\u6BB5\u540D
+      logic-delete-value: 1 # \u903B\u8F91\u5DF2\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 1\uFF09
+      logic-not-delete-value: 0 # \u903B\u8F91\u672A\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 0\uFF09
+      id-type: assign_id
+
+# 配置头像文件上传路径
+upload:
+  path: /Users/chenjiexiang/Downloads/avtarFile/
+
+

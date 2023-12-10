@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.bookprobyjays.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.bookprobyjays.domain.Order">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+            <result property="bookList" column="bookList" jdbcType="VARCHAR"/>
+            <result property="orderTime" column="orderTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isFinished" column="isFinished" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,bookList,
+        orderTime,updateTime,isFinished
+    </sql>
+</mapper>
