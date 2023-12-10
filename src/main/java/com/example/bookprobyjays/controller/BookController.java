@@ -6,8 +6,10 @@ import com.example.bookprobyjays.common.BaseResponse;
 import com.example.bookprobyjays.common.ErrorCode;
 import com.example.bookprobyjays.common.ResultUtils;
 import com.example.bookprobyjays.domain.Book;
+import com.example.bookprobyjays.dto.BookCartDto;
 import com.example.bookprobyjays.exception.BusinessException;
 import com.example.bookprobyjays.service.BookService;
+import com.example.bookprobyjays.service.OrderService;
 import com.example.bookprobyjays.utils.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ import javax.annotation.Resource;
 public class BookController {
     @Resource
     private BookService bookService;
+    @Resource
+    private OrderService orderService;
 
     /**
      * 添加书籍
@@ -90,5 +94,16 @@ public class BookController {
         Page<Book> pageInfo = bookService.page(new Page<>(current,pageSize),
                 bookService.queryWrapper(book));
         return ResultUtils.success(pageInfo);
+    }
+
+    /**
+     * 购物车添加书籍
+     * @param bookCartDto
+     * @return
+     */
+    @PostMapping("/addBookCart")
+    public BaseResponse<BookCartDto> addBookCart(@RequestBody BookCartDto bookCartDto){
+        orderService.addBookCart(bookCartDto);
+        return ResultUtils.success(bookCartDto);
     }
 }
