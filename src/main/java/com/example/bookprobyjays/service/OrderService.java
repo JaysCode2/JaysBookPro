@@ -12,4 +12,6 @@ import com.example.bookprobyjays.dto.BookCartDto;
 public interface OrderService extends IService<Order> {
     //购物车添加书籍
     BookCartDto addBookCart(BookCartDto bookCartDto);
+    //减少购物车书籍数量
+    BookCartDto deleteBookCart(BookCartDto bookCartDto);
 }

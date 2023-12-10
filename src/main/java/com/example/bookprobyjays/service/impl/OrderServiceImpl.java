@@ -55,12 +55,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         //查询redis中是否存在该书籍，若存在，直接加数量就行了
         if(stringRedisTemplate.opsForHash().hasKey(key,book.getId().toString())){
             //从redis里拿对象数据
-            String bookCartJson = (String) stringRedisTemplate.opsForHash().get(key,userId);
+            String bookCartJson = (String) stringRedisTemplate.opsForHash().get(key,book.getId().toString());
             BookCartVo bookCartVoUpdate = JSONUtil.toBean(bookCartJson, BookCartVo.class);
             //更新数量
-            log.info("原num:{};要添加的num:{}",bookCartVoUpdate.getNum(),bookCartDto.getNum());
             bookCartVoUpdate.setNum(bookCartVoUpdate.getNum()+bookCartDto.getNum());
-            log.info("相加后num:{}",bookCartVoUpdate.getNum());
             stringRedisTemplate.opsForHash().put(key,book.getId().toString(),JSONUtil.toJsonStr(bookCartVoUpdate));
             // stringRedisTemplate.expire(cartKey,10, TimeUnit.MINUTES);
         }else {
@@ -69,6 +67,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         }
 
         return bookCartDto;
+    }
+
+    /**
+     * 购物车减少功能
+     * @param bookCartDto
+     * @return
+     */
+    @Override
+    public BookCartDto deleteBookCart(BookCartDto bookCartDto) {
+
+        return null;
     }
 }
 
