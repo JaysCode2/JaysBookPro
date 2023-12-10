@@ -103,7 +103,24 @@ public class BookController {
      */
     @PostMapping("/addBookCart")
     public BaseResponse<BookCartDto> addBookCart(@RequestBody BookCartDto bookCartDto){
+        if(bookCartDto == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"书籍请求参数为空");
+        }
         orderService.addBookCart(bookCartDto);
+        return ResultUtils.success(bookCartDto);
+    }
+
+    /**
+     * 购物车删除、减少数量功能
+     * @param bookCartDto
+     * @return
+     */
+    @DeleteMapping("/deleteBookCart")
+    public  BaseResponse<BookCartDto> deleteBookCart(@RequestBody BookCartDto bookCartDto){
+        if(bookCartDto == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"书籍请求参数为空");
+        }
+        orderService.deleteBookCart(bookCartDto);
         return ResultUtils.success(bookCartDto);
     }
 }

@@ -77,8 +77,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
      */
     @Override
     public BookCartDto deleteBookCart(BookCartDto bookCartDto) {
+        String key = BOOK_CART_KEY+ UserHolder.getUser().getUserAccount();
+        String bookId = bookCartDto.getBookId().toString();
 
-        return null;
+        String bookCartJson = (String) stringRedisTemplate.opsForHash().get(key,bookId);
+        BookCartVo bookCartVoUpdate = JSONUtil.toBean(bookCartJson, BookCartVo.class);
+
+        if(bookCartDto.getNum() > bookCartVoUpdate.getNum()){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"需要删除的数量大于购物车中的数量");
+        }
+        bookCartVoUpdate.setNum(bookCartVoUpdate.getNum() - bookCartDto.getNum());
+        stringRedisTemplate.opsForHash().put(key,bookId,JSONUtil.toJsonStr(bookCartVoUpdate));
+
+        //判断是否为0，数量为0则删除key
+        if(bookCartVoUpdate.getNum() == 0){
+            stringRedisTemplate.opsForHash().delete(key,bookId);
+        }
+        return bookCartDto;
     }
 }
 
