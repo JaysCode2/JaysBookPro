@@ -12,7 +12,7 @@ import lombok.Data;
  * 
  * @TableName order
  */
-@TableName(value ="order")
+@TableName(value ="Userorder")
 @Data
 public class Order implements Serializable {
     /**

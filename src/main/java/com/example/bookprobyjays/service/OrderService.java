@@ -19,4 +19,9 @@ public interface OrderService extends IService<Order> {
     BookCartDto deleteBookCart(BookCartDto bookCartDto);
     //列出购物车订单
     List<BookCartVo> listBookCartVo();
+
+
+    //现在开始做下单功能
+    //下单功能，从redis拿购物车数据，存入order表
+    Order createOrder();
 }
