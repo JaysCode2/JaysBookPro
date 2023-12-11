@@ -12,6 +12,8 @@ import com.example.bookprobyjays.service.BookService;
 import com.example.bookprobyjays.service.OrderService;
 import com.example.bookprobyjays.utils.UserHolder;
 import com.example.bookprobyjays.vo.BookCartVo;
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/book")
+@Api(tags = "书籍管理接口")
 public class BookController {
     @Resource
     private BookService bookService;
@@ -31,6 +34,7 @@ public class BookController {
      * @param book
      * @return
      */
+    @Operation(summary = "添加书籍",description = "添加书籍功能")
     @PostMapping("/add")
     public BaseResponse<Book> addBook(@RequestBody Book book){
         if(StringUtils.isAnyBlank(book.getContent(),book.getTitle())){
@@ -55,6 +59,7 @@ public class BookController {
      * @param id
      * @return
      */
+    @Operation(summary = "删除书籍",description = "根据bookId删除书籍功能")
     @DeleteMapping("/delete/{id}")
     public BaseResponse<Boolean> deleteBook(@PathVariable long id){
         Book book = bookService.getById(id);
@@ -70,6 +75,7 @@ public class BookController {
      * @param book
      * @return
      */
+    @Operation(summary = "更改书籍信息",description = "更改书籍信息功能")
     @PutMapping("/update")
     public BaseResponse<Book> updateBook(@RequestBody Book book){
         if(book == null){
@@ -91,12 +97,11 @@ public class BookController {
      * @param book
      * @return
      */
+    @Operation(summary = "分页查询书籍",description = "分页查询书籍功能，同时提供了title和content查询方式")
     @GetMapping("/list/pageByWrapper")
     public BaseResponse<Page<Book>> getBookPage(long current,long pageSize,Book book){
         Page<Book> pageInfo = bookService.page(new Page<>(current,pageSize),
                 bookService.queryWrapper(book));
         return ResultUtils.success(pageInfo);
     }
-
-
 }
