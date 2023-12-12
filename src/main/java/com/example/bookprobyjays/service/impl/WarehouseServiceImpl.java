@@ -2,12 +2,20 @@ package com.example.bookprobyjays.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.bookprobyjays.common.ErrorCode;
+import com.example.bookprobyjays.domain.Book;
 import com.example.bookprobyjays.domain.Warehouse;
 import com.example.bookprobyjays.exception.BusinessException;
 import com.example.bookprobyjays.exception.ThrowUtils;
+import com.example.bookprobyjays.service.BookService;
 import com.example.bookprobyjays.service.WarehouseService;
 import com.example.bookprobyjays.mapper.WarehouseMapper;
+import com.example.bookprobyjays.vo.WareHouseListVo;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
 * @author chenjiexiang
@@ -17,6 +25,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class WarehouseServiceImpl extends ServiceImpl<WarehouseMapper, Warehouse>
     implements WarehouseService {
+    @Resource
+    private BookService bookService;
 
     /**
      * 添加书籍仓库信息
@@ -61,6 +71,26 @@ public class WarehouseServiceImpl extends ServiceImpl<WarehouseMapper, Warehouse
         boolean update =  this.updateById(warehouseExist);
         ThrowUtils.throwIf(!update, ErrorCode.SYSTEM_ERROR,"修改失败");
         return warehouseExist;
+    }
+
+    /**
+     * list出所有仓库的信息
+     * @return
+     */
+    @Override
+    public List<WareHouseListVo> listWareHouse() {
+        List<WareHouseListVo> wareHouseListVoList = new ArrayList<>();
+        List<Warehouse> warehouseList = this.list(null);
+        for(Warehouse warehouse : warehouseList){
+            WareHouseListVo wareHouseListVo = new WareHouseListVo();
+            Book book = bookService.getById(warehouse.getBookId());
+            wareHouseListVo.setBookId(warehouse.getBookId());
+            wareHouseListVo.setBookNum(warehouse.getBookNum());
+            wareHouseListVo.setTitle(book.getTitle());
+            wareHouseListVo.setContent(book.getContent());
+            wareHouseListVoList.add(wareHouseListVo);
+        }
+        return wareHouseListVoList;
     }
 }
 

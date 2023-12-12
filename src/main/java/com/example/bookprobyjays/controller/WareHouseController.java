@@ -6,10 +6,12 @@ import com.example.bookprobyjays.common.ResultUtils;
 import com.example.bookprobyjays.domain.Warehouse;
 import com.example.bookprobyjays.exception.BusinessException;
 import com.example.bookprobyjays.service.WarehouseService;
+import com.example.bookprobyjays.vo.WareHouseListVo;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/wareHouse")
@@ -30,8 +32,12 @@ public class WareHouseController {
         }
         return ResultUtils.success(warehouseService.addWarehouseBook(warehouse));
     }
-    //删除仓库书籍信息
 
+    /**
+     * 删除仓库书籍信息
+     * @param id
+     * @return
+     */
     @DeleteMapping("/deleteWareHouse/{id}")
     public BaseResponse<Long> deleteWareHouse(@PathVariable Long id){
         if(id == null){
@@ -43,7 +49,12 @@ public class WareHouseController {
         }
         return ResultUtils.success(warehouseService.deleteWarehouseBook(id));
     }
-    //修改仓库书籍信息
+
+    /**
+     * 修改仓库书籍信息
+     * @param warehouse
+     * @return
+     */
     @PutMapping("/updateWareHouse")
     public BaseResponse<Warehouse> updateWareHouse(@RequestBody Warehouse warehouse){
         if(warehouse == null){
@@ -51,5 +62,14 @@ public class WareHouseController {
         }
         return ResultUtils.success(warehouseService.updateWarehouseBook(warehouse));
     }
-    //查看仓库库存，并显示书籍相关信息
+
+    /**
+     * 查看仓库库存，并显示书籍相关信息
+     * 注意，这时候是只完成了listVo输出，但是一般要做分页，所有需要后续改进
+     * @return
+     */
+    @GetMapping("/listWarehouseVo")
+    public BaseResponse<List<WareHouseListVo>> listWarehouseVo(){
+        return ResultUtils.success(warehouseService.listWareHouse());
+    }
 }
