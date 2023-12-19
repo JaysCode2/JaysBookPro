@@ -1,5 +1,8 @@
 package com.example.bookprobyjays.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.bookprobyjays.domain.Book;
 import com.example.bookprobyjays.domain.Warehouse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.bookprobyjays.vo.WareHouseListVo;
@@ -20,4 +23,5 @@ public interface WarehouseService extends IService<Warehouse> {
     Warehouse updateWarehouseBook(Warehouse warehouse);
     //查看仓库库存，并显示书籍相关信息(可能需要一个vo),list转分页
     List<WareHouseListVo> listWareHouse();
+    
 }

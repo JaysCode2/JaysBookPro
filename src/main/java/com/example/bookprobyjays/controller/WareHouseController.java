@@ -5,6 +5,7 @@ import com.example.bookprobyjays.common.ErrorCode;
 import com.example.bookprobyjays.common.ResultUtils;
 import com.example.bookprobyjays.domain.Warehouse;
 import com.example.bookprobyjays.exception.BusinessException;
+import com.example.bookprobyjays.service.BookService;
 import com.example.bookprobyjays.service.WarehouseService;
 import com.example.bookprobyjays.vo.WareHouseListVo;
 import io.swagger.annotations.Api;
@@ -25,7 +26,7 @@ public class WareHouseController {
      * @param warehouse
      * @return
      */
-    @PostMapping("/addWareHouse")
+    @PostMapping("/add/WareHouse")
     public BaseResponse<Warehouse> addWareHouse(@RequestBody Warehouse warehouse){
         if(warehouse.getBookId() == null || warehouse.getBookNum() == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"书籍id或数量输入为空");
@@ -38,8 +39,8 @@ public class WareHouseController {
      * @param id
      * @return
      */
-    @DeleteMapping("/deleteWareHouse/{id}")
-    public BaseResponse<Long> deleteWareHouse(@PathVariable Long id){
+    @DeleteMapping("/delete/WareHouse/{id}")
+    public BaseResponse<Long> deleteWareHouse(@PathVariable("id") Long id){
         if(id == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"书籍id输入为空");
         }
@@ -55,7 +56,7 @@ public class WareHouseController {
      * @param warehouse
      * @return
      */
-    @PutMapping("/updateWareHouse")
+    @PutMapping("/update/WareHouse")
     public BaseResponse<Warehouse> updateWareHouse(@RequestBody Warehouse warehouse){
         if(warehouse == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"书籍修改信息为空");
@@ -68,7 +69,7 @@ public class WareHouseController {
      * 注意，这时候是只完成了listVo输出，但是一般要做分页，所有需要后续改进
      * @return
      */
-    @GetMapping("/listWarehouseVo")
+    @GetMapping("/list/WarehouseListVo")
     public BaseResponse<List<WareHouseListVo>> listWarehouseVo(){
         return ResultUtils.success(warehouseService.listWareHouse());
     }
