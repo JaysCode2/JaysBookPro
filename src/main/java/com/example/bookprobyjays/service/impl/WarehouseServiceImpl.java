@@ -93,8 +93,6 @@ public class WarehouseServiceImpl extends ServiceImpl<WarehouseMapper, Warehouse
         }
         return wareHouseListVoList;
     }
-
-
 }
 
 

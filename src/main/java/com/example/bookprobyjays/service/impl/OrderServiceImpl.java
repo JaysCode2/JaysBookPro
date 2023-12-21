@@ -7,16 +7,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.bookprobyjays.common.ErrorCode;
 import com.example.bookprobyjays.domain.Book;
 import com.example.bookprobyjays.domain.Order;
+import com.example.bookprobyjays.domain.Warehouse;
 import com.example.bookprobyjays.dto.BookCartDto;
 import com.example.bookprobyjays.exception.BusinessException;
 import com.example.bookprobyjays.service.BookService;
 import com.example.bookprobyjays.service.OrderService;
 import com.example.bookprobyjays.mapper.OrderMapper;
+import com.example.bookprobyjays.service.WarehouseService;
 import com.example.bookprobyjays.utils.UserHolder;
 import com.example.bookprobyjays.vo.BookCartVo;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -36,6 +40,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private BookService bookService;
+    @Resource
+    private RedissonClient redissonClient;
+    @Resource
+    private WarehouseService warehouseService;
 
     public final static String BOOK_CART_KEY = "book:cart:";
 
@@ -47,7 +55,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     @Override
     public BookCartDto addBookCart(BookCartDto bookCartDto) {
         String key = BOOK_CART_KEY+ UserHolder.getUser().getUserAccount();
-        String userId = UserHolder.getUser().getId().toString();
 
         Book book = bookService.getById(bookCartDto.getBookId());
         if(book == null){
@@ -70,7 +77,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
             //若不存在该书籍订单，那要添加进redis中
             stringRedisTemplate.opsForHash().put(key,book.getId().toString(), JSONUtil.toJsonStr(bookCartVo));
         }
-
         return bookCartDto;
     }
 
@@ -128,8 +134,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 
     /**
      * 从购物车拿订单，完成下单功能，完成
+     * 需要拓展的功能：下单后需要更新库存量，加分布式锁
      * @return
      */
+    @Transactional//涉及多表操作，需要开启事务
     @Override
     public Order createOrder() {
         List<BookCartVo> bookCartVoList = this.listBookCartVo();
@@ -138,6 +146,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         order.setBookList(bookCartVoListJson);
         order.setId(null);
         order.setUserId(UserHolder.getUser().getId());
+        //对list批量整理，更新对应库存信息
+        for(BookCartVo item : bookCartVoList){
+            Warehouse warehouse = warehouseService.getById(item.getBookId());
+            if(warehouse == null){
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"库存量不足,1");
+            }
+            warehouse.setBookNum(warehouse.getBookNum() - item.getNum());
+            //不能为负数
+            if(warehouse.getBookNum() < 0){
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"库存量不足,2");
+            }
+            warehouseService.updateWarehouseBook(warehouse);
+        }
         this.save(order);
         return order;
     }
