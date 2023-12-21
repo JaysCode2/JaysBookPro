@@ -193,6 +193,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
             }else {
                 throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"锁定失败");
             }
+        } catch (BusinessException e){
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
