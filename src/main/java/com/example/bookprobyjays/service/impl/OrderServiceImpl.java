@@ -155,7 +155,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
             warehouse.setBookNum(warehouse.getBookNum() - item.getNum());
             //不能为负数
             if(warehouse.getBookNum() < 0){
-                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"库存量不足,2");
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,item.getContent()+"库存量不足,2");
             }
             warehouseService.updateWarehouseBook(warehouse);
         }
