@@ -17,6 +17,7 @@ import com.example.bookprobyjays.service.WarehouseService;
 import com.example.bookprobyjays.utils.UserHolder;
 import com.example.bookprobyjays.vo.BookCartVo;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author chenjiexiang
@@ -140,26 +142,62 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     @Transactional//涉及多表操作，需要开启事务
     @Override
     public Order createOrder() {
+//        List<BookCartVo> bookCartVoList = this.listBookCartVo();
+//        String bookCartVoListJson = JSONUtil.toJsonStr(bookCartVoList);
+//        Order order = new Order();
+//        order.setBookList(bookCartVoListJson);
+//        order.setId(null);
+//        order.setUserId(UserHolder.getUser().getId());
+//        //对list批量整理，更新对应库存信息
+//        for(BookCartVo item : bookCartVoList){
+//            Warehouse warehouse = warehouseService.getById(item.getBookId());
+//            if(warehouse == null){
+//                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"库存量不足,1");
+//            }
+//            warehouse.setBookNum(warehouse.getBookNum() - item.getNum());
+//            //不能为负数
+//            if(warehouse.getBookNum() < 0){
+//                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,item.getContent()+"库存量不足,2");
+//            }
+//            warehouseService.updateWarehouseBook(warehouse);
+//        }
+//        this.save(order);
+        //
+        String lockKey = UserHolder.getUser().getUserAccount().toString();
+        RLock myLock = redissonClient.getLock(lockKey);
+
         List<BookCartVo> bookCartVoList = this.listBookCartVo();
         String bookCartVoListJson = JSONUtil.toJsonStr(bookCartVoList);
         Order order = new Order();
         order.setBookList(bookCartVoListJson);
         order.setId(null);
         order.setUserId(UserHolder.getUser().getId());
-        //对list批量整理，更新对应库存信息
-        for(BookCartVo item : bookCartVoList){
-            Warehouse warehouse = warehouseService.getById(item.getBookId());
-            if(warehouse == null){
-                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"库存量不足,1");
+
+        try {
+            if(myLock.tryLock(10,10, TimeUnit.SECONDS)){
+
+                //对list批量整理，更新对应库存信息
+                for(BookCartVo item : bookCartVoList){
+                    Warehouse warehouse = warehouseService.getById(item.getBookId());
+                    if(warehouse == null){
+                        throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"库存量不足,1");
+                    }
+                    warehouse.setBookNum(warehouse.getBookNum() - item.getNum());
+                    //不能为负数
+                    if(warehouse.getBookNum() < 0){
+                        throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,item.getContent()+"库存量不足,2");
+                    }
+                    warehouseService.updateWarehouseBook(warehouse);
+                }
+                this.save(order);
+            }else {
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"锁定失败");
             }
-            warehouse.setBookNum(warehouse.getBookNum() - item.getNum());
-            //不能为负数
-            if(warehouse.getBookNum() < 0){
-                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,item.getContent()+"库存量不足,2");
-            }
-            warehouseService.updateWarehouseBook(warehouse);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            myLock.unlock();
         }
-        this.save(order);
         return order;
     }
 }
