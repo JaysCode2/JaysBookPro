@@ -136,12 +136,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 
     /**
      * 从购物车拿订单，完成下单功能，完成
-     * 需要拓展的功能：下单后需要更新库存量，加分布式锁
+     * 需要拓展的功能：下单后需要更新库存量，加分布式锁(已完成)
      * @return
      */
     @Transactional//涉及多表操作，需要开启事务
     @Override
     public Order createOrder() {
+        //原业务实现逻辑
 //        List<BookCartVo> bookCartVoList = this.listBookCartVo();
 //        String bookCartVoListJson = JSONUtil.toJsonStr(bookCartVoList);
 //        Order order = new Order();
@@ -162,7 +163,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 //            warehouseService.updateWarehouseBook(warehouse);
 //        }
 //        this.save(order);
-        //
+        //重新构建，完善功能
         String lockKey = UserHolder.getUser().getUserAccount().toString();
         RLock myLock = redissonClient.getLock(lockKey);
 
